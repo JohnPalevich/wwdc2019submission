@@ -15,8 +15,12 @@ class ViewController: UIViewController, ARSCNViewDelegate {
     @IBOutlet var sceneView: ARSCNView!
     var tree: SCNNode?
     var forest:[SCNNode] = []
+    var isBurning: [[Bool]] = Array(repeating: Array(repeating: false, count: 20), count: 20)
+    var numTrees: Int?
     var burningTrees:[SCNNode] = []
+    var spreadTrees: [Int] = []
     var rootNode: SCNNode?
+    var timer: Timer?
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -33,7 +37,7 @@ class ViewController: UIViewController, ARSCNViewDelegate {
         sceneView.scene = scene
         sceneView.autoenablesDefaultLighting = true
         
-        
+        numTrees = 20
 //        sceneView.debugOptions = [ARSCNDebugOptions.showFeaturePoints,
 //                                  ARSCNDebugOptions.showWorldOrigin/*,
 //             .showBoundingBoxes,
@@ -49,13 +53,19 @@ class ViewController: UIViewController, ARSCNViewDelegate {
         scene.rootNode.addChildNode(cameraNode)
         rootNode = scene.rootNode
         createTrees()
+        timer =  Timer.scheduledTimer(withTimeInterval: 5, repeats: true) { (t) in
+            self.updateGame()}
+    }
+    
+    func updateGame(){
+        spreadFire()
         igniteTree()
     }
     
     func createTrees(){
         tree = treeNode()
-        for i in -10..<10{
-            for j in -10..<10{
+        for i in -numTrees!/2..<numTrees!/2{
+            for j in -numTrees!/2..<numTrees!/2{
                 let newTree = tree!.clone()
                 newTree.name = "tree"
                 newTree.simdPosition = float3(1 * Float(i), -10, 1*Float(j))
@@ -67,15 +77,66 @@ class ViewController: UIViewController, ARSCNViewDelegate {
 
     }
     
-    func igniteTree(){
-        let number = Int.random(in: 0 ..< forest.count)
-        let oldTree = forest[number]
+    func spreadFire(){
+        for i in 0..<numTrees!{
+            for j in 0..<numTrees!{
+                if isBurning[i][j]{
+                    if i+1 < numTrees! && !isBurning[i+1][j]{
+                        igniteSpecifiedTree(pos: (i+1)*10 + j, x:(i+1)*10, y: j)
+                        spreadTrees.append(i+1)
+                        spreadTrees.append(j)
+                    }
+                    if i-1 >= 0 && !isBurning[i-1][j]{
+                        igniteSpecifiedTree(pos: (i-1)*10 + j, x:(i-1)*10, y: j)
+                        spreadTrees.append(i-1)
+                        spreadTrees.append(j)
+                    }
+                    if j+1 < numTrees! && !isBurning[i][j+1]{
+                        igniteSpecifiedTree(pos: i*10 + j+11, x:i*10, y: j+1)
+                        spreadTrees.append(i)
+                        spreadTrees.append(j+1)
+                    }
+                    if j-1 >= 0 && !isBurning[i][j-1]{
+                        igniteSpecifiedTree(pos: i*10 + j-1, x:i*10, y: j-1)
+                        spreadTrees.append(i)
+                        spreadTrees.append(j-1)
+                    }
+                }
+            }
+        }
+        while spreadTrees.count > 0{
+            isBurning[spreadTrees[0]][spreadTrees[1]] = true
+            spreadTrees.remove(at: 1)
+            spreadTrees.remove(at: 0)
+        }
+    }
+    
+    func igniteSpecifiedTree(pos:Int, x:Int, y:Int){
+        let oldTree = forest[pos]
         let ignitedTree = fireTreeNode()
         ignitedTree.simdPosition = oldTree.simdPosition
         ignitedTree.simdScale = oldTree.simdScale
-        oldTree.removeFromParentNode()
-        rootNode!.addChildNode(ignitedTree)
-        forest.remove(at: number)
+        rootNode!.replaceChildNode(oldTree, with: ignitedTree)
+        burningTrees.append(ignitedTree)
+    }
+    
+    func igniteTree(){
+        var number = Int.random(in: 0 ..< forest.count)
+        var oldTree = forest[number]
+        var x = Int(oldTree.simdPosition.x + Float(numTrees!/2))
+        var z = Int(oldTree.simdPosition.z + Float(numTrees!/2))
+//        while(isBurning[x][z]){
+//            number = Int.random(in: 0 ..< forest.count)
+//            oldTree = forest[number]
+//            x = Int(oldTree.simdPosition.x + Float(numTrees!/2))
+//            z = Int(oldTree.simdPosition.z + Float(numTrees!/2))
+//        }
+        let ignitedTree = fireTreeNode()
+        ignitedTree.simdPosition = oldTree.simdPosition
+        ignitedTree.simdScale = oldTree.simdScale
+        
+        isBurning[x][z] = true
+        rootNode!.replaceChildNode(oldTree, with: ignitedTree)
         burningTrees.append(ignitedTree)
     }
     
@@ -84,10 +145,9 @@ class ViewController: UIViewController, ARSCNViewDelegate {
         newTree.name = "tree"
         newTree.simdPosition = savedTree.simdPosition
         newTree.simdScale = savedTree.simdScale
-        savedTree.removeFromParentNode()
-        rootNode!.addChildNode(newTree)
+        isBurning[Int(newTree.simdPosition.x + Float(numTrees!/2))][Int(newTree.simdPosition.z + Float(numTrees!/2))] = false
+        rootNode!.replaceChildNode(savedTree, with: newTree)
         burningTrees.remove(at: burningTrees.firstIndex(of: savedTree)!)
-        forest.append(newTree)
     }
 
     

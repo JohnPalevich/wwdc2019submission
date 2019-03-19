@@ -34,14 +34,14 @@ class ViewController: UIViewController, ARSCNViewDelegate {
         sceneView.autoenablesDefaultLighting = true
         
         
-        sceneView.debugOptions = [ARSCNDebugOptions.showFeaturePoints,
-                                  ARSCNDebugOptions.showWorldOrigin/*,
-             .showBoundingBoxes,
-             .showWireframe,
-             .showSkeletons,
-             .showPhysicsShapes,
-             .showCameras*/
-        ]
+//        sceneView.debugOptions = [ARSCNDebugOptions.showFeaturePoints,
+//                                  ARSCNDebugOptions.showWorldOrigin/*,
+//             .showBoundingBoxes,
+//             .showWireframe,
+//             .showSkeletons,
+//             .showPhysicsShapes,
+//             .showCameras*/
+//        ]
         // a camera
         let cameraNode = SCNNode()
         cameraNode.camera = SCNCamera()
@@ -84,7 +84,9 @@ class ViewController: UIViewController, ARSCNViewDelegate {
         newTree.name = "tree"
         newTree.simdPosition = savedTree.simdPosition
         newTree.simdScale = savedTree.simdScale
+        savedTree.removeFromParentNode()
         rootNode!.addChildNode(newTree)
+        burningTrees.remove(at: burningTrees.firstIndex(of: savedTree)!)
         forest.append(newTree)
     }
 
@@ -107,7 +109,8 @@ class ViewController: UIViewController, ARSCNViewDelegate {
         
         // Let's test if a 3D Object was touch
         var hitTestOptions = [SCNHitTestOption: Any]()
-        //hitTestOptions[SCNHitTestOption.boundingBoxOnly] = true
+        hitTestOptions[SCNHitTestOption.boundingBoxOnly] = true
+        //hitTestOptions[SCNHitTestOption.ignoreChildNodes] = true
         
         let hitResults: [SCNHitTestResult]  = sceneView.hitTest(location, options: hitTestOptions)
         

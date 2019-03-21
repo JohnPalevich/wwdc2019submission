@@ -119,7 +119,10 @@ class ViewController: UIViewController, ARSCNViewDelegate {
     func igniteSpecifiedTree(x:Int, y:Int){
         let oldTree = forest![x][y]
         let ignitedTree = fireTreeNode()
+        let fireParticle = fireParticleSystem()
+        fireParticle.emitterShape = ignitedTree.geometry
         ignitedTree.name = "burning"
+        ignitedTree.addParticleSystem(fireParticle)
         ignitedTree.simdPosition = oldTree.simdPosition
         ignitedTree.simdScale = oldTree.simdScale
         rootNode!.replaceChildNode(oldTree, with: ignitedTree)
@@ -201,6 +204,11 @@ class ViewController: UIViewController, ARSCNViewDelegate {
         let fireTreeScene = SCNScene(named: "art.scnassets/FireTreeModel.dae")!
         let fireTree = fireTreeScene.rootNode
         return fireTree
+    }
+    
+    func fireParticleSystem() -> SCNParticleSystem{
+        let particleSystem = SCNParticleSystem(named: "Fire.scnp", inDirectory: nil)
+        return particleSystem!
     }
     
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {

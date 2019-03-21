@@ -13,6 +13,8 @@
 		52E58015223F37DD00C4179D /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 52E58013223F37DD00C4179D /* Main.storyboard */; };
 		52E58017223F37DF00C4179D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 52E58016223F37DF00C4179D /* Assets.xcassets */; };
 		52E5801A223F37DF00C4179D /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 52E58018223F37DF00C4179D /* LaunchScreen.storyboard */; };
+		52FF1F9622435B88004B18C9 /* spark.png in Resources */ = {isa = PBXBuildFile; fileRef = 52FF1F9422435B88004B18C9 /* spark.png */; };
+		52FF1F9722435B88004B18C9 /* Fire.scnp in Resources */ = {isa = PBXBuildFile; fileRef = 52FF1F9522435B88004B18C9 /* Fire.scnp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -24,6 +26,8 @@
 		52E58016223F37DF00C4179D /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		52E58019223F37DF00C4179D /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		52E5801B223F37DF00C4179D /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		52FF1F9422435B88004B18C9 /* spark.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = spark.png; path = art.scnassets/spark.png; sourceTree = "<group>"; };
+		52FF1F9522435B88004B18C9 /* Fire.scnp */ = {isa = PBXFileReference; lastKnownFileType = file.scp; name = Fire.scnp; path = art.scnassets/Fire.scnp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -63,6 +67,8 @@
 				52E58016223F37DF00C4179D /* Assets.xcassets */,
 				52E58018223F37DF00C4179D /* LaunchScreen.storyboard */,
 				52E5801B223F37DF00C4179D /* Info.plist */,
+				52FF1F9422435B88004B18C9 /* spark.png */,
+				52FF1F9522435B88004B18C9 /* Fire.scnp */,
 			);
 			path = FireWatcher;
 			sourceTree = "<group>";
@@ -125,9 +131,11 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				52FF1F9622435B88004B18C9 /* spark.png in Resources */,
 				52E58010223F37DD00C4179D /* art.scnassets in Resources */,
 				52E5801A223F37DF00C4179D /* LaunchScreen.storyboard in Resources */,
 				52E58017223F37DF00C4179D /* Assets.xcassets in Resources */,
+				52FF1F9722435B88004B18C9 /* Fire.scnp in Resources */,
 				52E58015223F37DD00C4179D /* Main.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

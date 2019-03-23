@@ -16,7 +16,7 @@ public class ViewController: UIViewController, ARSCNViewDelegate {
     var tree: SCNNode?
     var forest:[[SCNNode]]?
     var isBurning: [[Bool]]?
-    var numTrees: Int?
+    public var numTrees = 20
     var burningTrees:[SCNNode] = []
     var particles: [[Int]]?
     var spreadTrees: [Int] = []
@@ -31,10 +31,13 @@ public class ViewController: UIViewController, ARSCNViewDelegate {
     var crowAudioPlayer: SCNAudioPlayer?
     var rainSound = SCNAudioSource(fileNamed: "art.scnassets/Rain.wav")!
     var rainAudioPlayer: SCNAudioPlayer?
+    public var spreadPeriod = 15
+    public var ignitionPeriod = 5
     var rainSoundPlay = false
     var fireSoundPlay = false
     var numOnFire = 0
     var counter = 0
+    
     public override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -67,33 +70,29 @@ public class ViewController: UIViewController, ARSCNViewDelegate {
     }
     
     func setUpWorld(){
-        numTrees = 20
-        forest = Array(repeating: Array(repeating: SCNNode(), count: numTrees!), count: numTrees!)
-        isBurning = Array(repeating: Array(repeating: false, count: numTrees!), count: numTrees!)
-        particles = Array(repeating: Array(repeating: 0, count: numTrees!), count: numTrees!)
-        rainParticles = Array(repeating: Array(repeating: SCNNode(), count: numTrees!), count: numTrees!)
+        //numTrees = 20
+        forest = Array(repeating: Array(repeating: SCNNode(), count: numTrees), count: numTrees)
+        isBurning = Array(repeating: Array(repeating: false, count: numTrees), count: numTrees)
+        particles = Array(repeating: Array(repeating: 0, count: numTrees), count: numTrees)
+        rainParticles = Array(repeating: Array(repeating: SCNNode(), count: numTrees), count: numTrees)
         rootNode = SCNNode()
         initializeNodes()
-        //igniteTree()
-        //igniteSpecifiedTree(x: 0, y: 0)
-        //isBurning![0][0] = true
         timer =  Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { (t) in
             self.updateGame()}
     }
     
     func updateGame(){
-        if counter != 0 && counter % 15 == 0{
+        if counter != 0 && counter % spreadPeriod == 0{
             spreadFire()
             
         }
-        if counter >= 10 && counter % 5 == 0{
+        if counter >= 10 && counter % ignitionPeriod == 0{
             updateParticles()
             igniteTree()
         }
         if counter == 0{
             meadowSFX()
         }
-        //print(numOnFire)
         if(!fireSoundPlay && numOnFire > 0){
             fireSFX()
             stopMeadowSFX()
@@ -112,10 +111,10 @@ public class ViewController: UIViewController, ARSCNViewDelegate {
         tree = treeNode()
         let rainNode = SCNNode()
         //rainNode = rainNode()
-        for i in -numTrees!/2..<numTrees!/2{
-            for j in -numTrees!/2..<numTrees!/2{
+        for i in -numTrees/2..<numTrees/2{
+            for j in -numTrees/2..<numTrees/2{
                 let newRain = rainNode.clone()
-                newRain.simdPosition = float3(1 * Float(i), 10, 1 * Float(j))
+                newRain.simdPosition = float3(1 * Float(i), 20, 1 * Float(j))
                 let newTree = tree!.clone()
                 newTree.name = "tree"
                 newTree.simdPosition = float3(1 * Float(i), 0.5, 1*Float(j))
@@ -123,17 +122,17 @@ public class ViewController: UIViewController, ARSCNViewDelegate {
                 newTree.simdScale = float3(0.1*randScale,0.1*randScale,0.1*randScale)
                 rootNode!.addChildNode(newTree)
                 rootNode!.addChildNode(newRain)
-                rainParticles![i+numTrees!/2][j+numTrees!/2] = newRain
-                forest![i+numTrees!/2][j+numTrees!/2] = newTree
+                rainParticles![i+numTrees/2][j+numTrees/2] = newRain
+                forest![i+numTrees/2][j+numTrees/2] = newTree
             }
         }
     }
     
     func spreadFire(){
-        for i in 0..<numTrees!{
-            for j in 0..<numTrees!{
+        for i in 0..<numTrees{
+            for j in 0..<numTrees{
                 if isBurning![i][j] && forest![i][j].name == "burning"{
-                    if i+1 < numTrees! && !isBurning![i+1][j] && forest![i+1][j].name != "burning"{
+                    if i+1 < numTrees && !isBurning![i+1][j] && forest![i+1][j].name != "burning"{
                         igniteSpecifiedTree(x:(i+1), y: j)
                         spreadTrees.append(i+1)
                         spreadTrees.append(j)
@@ -143,7 +142,7 @@ public class ViewController: UIViewController, ARSCNViewDelegate {
                         spreadTrees.append(i-1)
                         spreadTrees.append(j)
                     }
-                    if j+1 < numTrees! && !isBurning![i][j+1] && forest![i][j+1].name != "burning"{
+                    if j+1 < numTrees && !isBurning![i][j+1] && forest![i][j+1].name != "burning"{
                         igniteSpecifiedTree(x:i, y: j+1)
                         spreadTrees.append(i)
                         spreadTrees.append(j+1)
@@ -164,8 +163,8 @@ public class ViewController: UIViewController, ARSCNViewDelegate {
     }
     
     func updateParticles(){
-        for i in 0..<numTrees!{
-            for j in 0..<numTrees!{
+        for i in 0..<numTrees{
+            for j in 0..<numTrees{
                 if particles![i][j] == 1{
                     particles![i][j] = 2
                     forest![i][j].removeAllParticleSystems()
@@ -194,7 +193,9 @@ public class ViewController: UIViewController, ARSCNViewDelegate {
                         stopRainSFX()
                         rainSoundPlay = false
                     }
-                    rainParticles![i][j].removeAllParticleSystems()
+                    rootNode?.replaceChildNode(rainParticles![i][j], with: SCNNode())
+                    rainParticles![i][j] = SCNNode()
+                    
                 }
             }
         }
@@ -223,8 +224,8 @@ public class ViewController: UIViewController, ARSCNViewDelegate {
     
     func igniteTree(){
         numOnFire = numOnFire + 1
-        let randX = Int.random(in: 0 ..< numTrees!)
-        let randY = Int.random(in: 0 ..< numTrees!)
+        let randX = Int.random(in: 0 ..< numTrees)
+        let randY = Int.random(in: 0 ..< numTrees)
         let oldTree = forest![randX][randY]
 //        while(isBurning[x][z]){
 //            number = Int.random(in: 0 ..< forest.count)
@@ -250,28 +251,28 @@ public class ViewController: UIViewController, ARSCNViewDelegate {
     }
     
     func saveTrees(middleTree:SCNNode){
-        let x = Int(middleTree.simdPosition.x) + numTrees!/2
-        let y = Int(middleTree.simdPosition.z) + numTrees!/2
+        let x = Int(middleTree.simdPosition.x) + numTrees/2
+        let y = Int(middleTree.simdPosition.z) + numTrees/2
         saveTree(savedTree: middleTree, x: x, y: y )
-        if(x+1 < numTrees! && isBurning![x+1][y]){
+        if(x+1 < numTrees && isBurning![x+1][y]){
             saveTree(savedTree: forest![x+1][y], x: x+1, y: y)
         }
-        if(x+1 < numTrees! && y+1 < numTrees! && isBurning![x+1][y+1]){
+        if(x+1 < numTrees && y+1 < numTrees && isBurning![x+1][y+1]){
             saveTree(savedTree: forest![x+1][y+1], x: x+1, y: y+1)
         }
-        if(x+1 < numTrees! && y-1 >= 0 && isBurning![x+1][y-1]){
+        if(x+1 < numTrees && y-1 >= 0 && isBurning![x+1][y-1]){
             saveTree(savedTree: forest![x+1][y-1], x: x+1, y: y-1)
         }
         if(x-1 >= 0 && isBurning![x-1][y]){
             saveTree(savedTree: forest![x-1][y], x: x-1, y: y)
         }
-        if(x-1 >= 0 && y+1 < numTrees! && isBurning![x-1][y+1]){
+        if(x-1 >= 0 && y+1 < numTrees && isBurning![x-1][y+1]){
             saveTree(savedTree: forest![x-1][y+1], x: x-1, y: y+1)
         }
         if(x-1 >= 0 && y-1 >= 0 && isBurning![x-1][y-1]){
             saveTree(savedTree: forest![x-1][y-1], x: x-1, y: y-1)
         }
-        if(y+1 < numTrees! && isBurning![x][y+1]){
+        if(y+1 < numTrees && isBurning![x][y+1]){
             saveTree(savedTree: forest![x][y+1], x: x, y: y+1)
         }
         if(y-1 >= 0 && isBurning![x][y-1]){
@@ -290,16 +291,22 @@ public class ViewController: UIViewController, ARSCNViewDelegate {
         rainSoundPlay = true
         numOnFire = numOnFire - 1
         let newTree = tree!.clone()
+        
+        let cloud = cloudNode()
+        cloud.simdPosition = rainParticles![x][y].simdPosition
+        cloud.simdScale = float3(0.225, 0.225, 0.225)
         let rainParticle = rainParticleSystem()
-        rainParticle.emitterShape = rainParticles![x][y].geometry
-        rainParticle.particleSize = 0.01
+        rainParticle.emitterShape = cloud.geometry
+        rainParticle.particleSize = 0.005
+        cloud.addParticleSystem(rainParticle)
         newTree.name = "tree"
         newTree.simdPosition = savedTree.simdPosition
-        rainParticles![x][y].addParticleSystem(rainParticle)
         newTree.simdScale = savedTree.simdScale
         particles![x][y] = 4
         isBurning![x][y] = false
         rootNode!.replaceChildNode(savedTree, with: newTree)
+        rootNode!.replaceChildNode(rainParticles![x][y], with: cloud)
+        rainParticles![x][y] = cloud
         forest![x][y] = newTree
         burningTrees.remove(at: burningTrees.firstIndex(of: savedTree)!)
     }
@@ -355,6 +362,12 @@ public class ViewController: UIViewController, ARSCNViewDelegate {
         let deadTreeScene = SCNScene(named: "art.scnassets/DeadTreeModel.dae")
         let deadTree = deadTreeScene?.rootNode
         return deadTree!
+    }
+    
+    func cloudNode() -> SCNNode{
+        let cloudScene = SCNScene(named: "art.scnassets/CloudModel.dae")
+        let cloud = cloudScene?.rootNode
+        return cloud!
     }
     
     func fireParticleSystem() -> SCNParticleSystem{

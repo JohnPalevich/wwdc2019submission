@@ -4,7 +4,7 @@
 set -e
 set -u
 
-APPNAME=arkit2
+APPNAME=FireWatcher
 SRCROOT=playgroundbook.template
 DSTROOT=../$APPNAME.playgroundbook
 

@@ -23,6 +23,13 @@ public class ViewController: UIViewController, ARSCNViewDelegate {
     var rainParticles: [[SCNNode]]?
     var rootNode: SCNNode?
     var timer: Timer?
+    var fireSound = SCNAudioSource(fileNamed: "art.scnassets/Fire.wav")!
+    var fireAudioPlayer: SCNAudioPlayer?
+    var meadowSound = SCNAudioSource(fileNamed: "art.scnassets/Meadow.wav")!
+    var meadowAudioPlayer: SCNAudioPlayer?
+    var fireSoundPlay = false
+    var numOnFire = 0
+    var counter = 0
     public override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -46,6 +53,10 @@ public class ViewController: UIViewController, ARSCNViewDelegate {
         cameraNode.camera = SCNCamera()
         cameraNode.position = SCNVector3(x: 0, y: 0, z: 3)
         scene.rootNode.addChildNode(cameraNode)
+        
+        //fireAudioPlayer = SCNAudioPlayer(source: fireSound)
+        fireSound.loops = true
+        meadowSound.loops = true
     }
     
     func setUpWorld(){
@@ -65,17 +76,35 @@ public class ViewController: UIViewController, ARSCNViewDelegate {
         // a camera
         rootNode = SCNNode()
         initializeNodes()
-        igniteTree()
+        //igniteTree()
         //igniteSpecifiedTree(x: 0, y: 0)
         //isBurning![0][0] = true
-        timer =  Timer.scheduledTimer(withTimeInterval: 5, repeats: true) { (t) in
+        timer =  Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { (t) in
             self.updateGame()}
     }
     
     func updateGame(){
-        updateParticles()
-        spreadFire()
-        igniteTree()
+        if counter != 0 && counter % 10 == 0{
+            updateParticles()
+            spreadFire()
+            igniteTree()
+        }
+        if counter == 0{
+            meadowSFX()
+        }
+        //print(numOnFire)
+        if(!fireSoundPlay && numOnFire > 0){
+            fireSFX()
+            stopMeadowSFX()
+            fireSoundPlay = true
+        }
+        else if (fireSoundPlay && numOnFire == 0){
+            stopFireSFX()
+            meadowSFX()
+            fireSoundPlay = false
+        }
+        counter = counter + 1
+        
     }
     
     func initializeNodes(){
@@ -166,6 +195,7 @@ public class ViewController: UIViewController, ARSCNViewDelegate {
     }
     
     func igniteSpecifiedTree(x:Int, y:Int){
+        numOnFire = numOnFire + 1
         let oldTree = forest![x][y]
         let ignitedTree = fireTreeNode()
         let smokeParticle = smokeParticleSystem()
@@ -186,6 +216,7 @@ public class ViewController: UIViewController, ARSCNViewDelegate {
     }
     
     func igniteTree(){
+        numOnFire = numOnFire + 1
         let randX = Int.random(in: 0 ..< numTrees!)
         let randY = Int.random(in: 0 ..< numTrees!)
         let oldTree = forest![randX][randY]
@@ -243,9 +274,11 @@ public class ViewController: UIViewController, ARSCNViewDelegate {
     }
     
     func saveTree(savedTree:SCNNode, x:Int, y:Int){
+        
         if(forest![x][y].name != "burning"){
             return
         }
+        numOnFire = numOnFire - 1
         let newTree = tree!.clone()
         let rainParticle = rainParticleSystem()
         rainParticle.emitterShape = rainParticles![x][y].geometry
@@ -261,6 +294,25 @@ public class ViewController: UIViewController, ARSCNViewDelegate {
         burningTrees.remove(at: burningTrees.firstIndex(of: savedTree)!)
     }
 
+    func fireSFX(){
+        fireAudioPlayer = SCNAudioPlayer(source: fireSound)
+        rootNode!.addAudioPlayer(fireAudioPlayer!)
+        print("lite")
+    }
+    
+    func stopFireSFX(){
+        print("stop")
+        rootNode!.removeAudioPlayer(fireAudioPlayer!)
+    }
+    
+    func meadowSFX(){
+        meadowAudioPlayer = SCNAudioPlayer(source: meadowSound)
+        rootNode!.addAudioPlayer(meadowAudioPlayer!)
+    }
+    
+    func stopMeadowSFX(){
+        rootNode!.removeAudioPlayer(meadowAudioPlayer!)
+    }
     
     func treeNode() -> SCNNode {
         let treeScene = SCNScene(named: "art.scnassets/TreeModel.dae")!

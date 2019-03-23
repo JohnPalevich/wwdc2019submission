@@ -25,6 +25,8 @@ public class ViewController: UIViewController, ARSCNViewDelegate {
     var timer: Timer?
     var fireSound = SCNAudioSource(fileNamed: "art.scnassets/Fire.wav")!
     var fireAudioPlayer: SCNAudioPlayer?
+    var meadowSound = SCNAudioSource(fileNamed: "art.scnassets/Meadow.wav")!
+    var meadowAudioPlayer: SCNAudioPlayer?
     var fireSoundPlay = false
     var numOnFire = 0
     var counter = 0
@@ -54,6 +56,7 @@ public class ViewController: UIViewController, ARSCNViewDelegate {
         
         //fireAudioPlayer = SCNAudioPlayer(source: fireSound)
         fireSound.loops = true
+        meadowSound.loops = true
     }
     
     func setUpWorld(){
@@ -73,7 +76,7 @@ public class ViewController: UIViewController, ARSCNViewDelegate {
         // a camera
         rootNode = SCNNode()
         initializeNodes()
-        igniteTree()
+        //igniteTree()
         //igniteSpecifiedTree(x: 0, y: 0)
         //isBurning![0][0] = true
         timer =  Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { (t) in
@@ -81,18 +84,23 @@ public class ViewController: UIViewController, ARSCNViewDelegate {
     }
     
     func updateGame(){
-        if counter % 10 == 0{
+        if counter != 0 && counter % 10 == 0{
             updateParticles()
             spreadFire()
             igniteTree()
         }
-        print(numOnFire)
+        if counter == 0{
+            meadowSFX()
+        }
+        //print(numOnFire)
         if(!fireSoundPlay && numOnFire > 0){
             fireSFX()
+            stopMeadowSFX()
             fireSoundPlay = true
         }
         else if (fireSoundPlay && numOnFire == 0){
             stopFireSFX()
+            meadowSFX()
             fireSoundPlay = false
         }
         counter = counter + 1
@@ -295,6 +303,15 @@ public class ViewController: UIViewController, ARSCNViewDelegate {
     func stopFireSFX(){
         print("stop")
         rootNode!.removeAudioPlayer(fireAudioPlayer!)
+    }
+    
+    func meadowSFX(){
+        meadowAudioPlayer = SCNAudioPlayer(source: meadowSound)
+        rootNode!.addAudioPlayer(meadowAudioPlayer!)
+    }
+    
+    func stopMeadowSFX(){
+        rootNode!.removeAudioPlayer(meadowAudioPlayer!)
     }
     
     func treeNode() -> SCNNode {

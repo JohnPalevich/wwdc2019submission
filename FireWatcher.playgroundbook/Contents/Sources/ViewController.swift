@@ -27,6 +27,9 @@ public class ViewController: UIViewController, ARSCNViewDelegate {
     var fireAudioPlayer: SCNAudioPlayer?
     var meadowSound = SCNAudioSource(fileNamed: "art.scnassets/Meadow.wav")!
     var meadowAudioPlayer: SCNAudioPlayer?
+    var rainSound = SCNAudioSource(fileNamed: "art.scnassets/Rain.wav")!
+    var rainAudioPlayer: SCNAudioPlayer?
+    var rainSoundPlay = false
     var fireSoundPlay = false
     var numOnFire = 0
     var counter = 0
@@ -57,6 +60,7 @@ public class ViewController: UIViewController, ARSCNViewDelegate {
         //fireAudioPlayer = SCNAudioPlayer(source: fireSound)
         fireSound.loops = true
         meadowSound.loops = true
+        rainSound.loops = true
     }
     
     func setUpWorld(){
@@ -65,15 +69,6 @@ public class ViewController: UIViewController, ARSCNViewDelegate {
         isBurning = Array(repeating: Array(repeating: false, count: numTrees!), count: numTrees!)
         particles = Array(repeating: Array(repeating: 0, count: numTrees!), count: numTrees!)
         rainParticles = Array(repeating: Array(repeating: SCNNode(), count: numTrees!), count: numTrees!)
-        //        sceneView.debugOptions = [ARSCNDebugOptions.showFeaturePoints,
-        //                                  ARSCNDebugOptions.showWorldOrigin/*,
-        //             .showBoundingBoxes,
-        //             .showWireframe,
-        //             .showSkeletons,
-        //             .showPhysicsShapes,
-        //             .showCameras*/
-        //        ]
-        // a camera
         rootNode = SCNNode()
         initializeNodes()
         //igniteTree()
@@ -85,8 +80,12 @@ public class ViewController: UIViewController, ARSCNViewDelegate {
     
     func updateGame(){
         if counter != 0 && counter % 10 == 0{
-            updateParticles()
+            
             spreadFire()
+            
+        }
+        if counter >= 10 && counter % 5 == 0{
+            updateParticles()
             igniteTree()
         }
         if counter == 0{
@@ -118,7 +117,8 @@ public class ViewController: UIViewController, ARSCNViewDelegate {
                 let newTree = tree!.clone()
                 newTree.name = "tree"
                 newTree.simdPosition = float3(1 * Float(i), 0.5, 1*Float(j))
-                newTree.simdScale = float3(0.1,0.1,0.1)
+                let randScale = Float.random(in: 1 ..< 3)
+                newTree.simdScale = float3(0.1*randScale,0.1*randScale,0.1*randScale)
                 rootNode!.addChildNode(newTree)
                 rootNode!.addChildNode(newRain)
                 rainParticles![i+numTrees!/2][j+numTrees!/2] = newRain
@@ -188,6 +188,10 @@ public class ViewController: UIViewController, ARSCNViewDelegate {
                 }
                 else if(particles![i][j] == 4){
                     particles![i][j] = 0
+                    if(rainSoundPlay){
+                        stopRainSFX()
+                        rainSoundPlay = false
+                    }
                     rainParticles![i][j].removeAllParticleSystems()
                 }
             }
@@ -278,6 +282,10 @@ public class ViewController: UIViewController, ARSCNViewDelegate {
         if(forest![x][y].name != "burning"){
             return
         }
+        if(!rainSoundPlay){
+            rainSFX()
+        }
+        rainSoundPlay = true
         numOnFire = numOnFire - 1
         let newTree = tree!.clone()
         let rainParticle = rainParticleSystem()
@@ -297,12 +305,24 @@ public class ViewController: UIViewController, ARSCNViewDelegate {
     func fireSFX(){
         fireAudioPlayer = SCNAudioPlayer(source: fireSound)
         rootNode!.addAudioPlayer(fireAudioPlayer!)
-        print("lite")
     }
     
     func stopFireSFX(){
-        print("stop")
         rootNode!.removeAudioPlayer(fireAudioPlayer!)
+    }
+
+    func rainSFX(){
+        rainAudioPlayer = SCNAudioPlayer(source: rainSound)
+        rootNode!.addAudioPlayer(rainAudioPlayer!)
+        print("lite")
+    }
+    
+    func stopRainSFX(){
+        print("stop")
+        if(rainAudioPlayer == nil){
+            return
+        }
+        rootNode!.removeAudioPlayer(rainAudioPlayer!)
     }
     
     func meadowSFX(){
@@ -366,20 +386,6 @@ public class ViewController: UIViewController, ARSCNViewDelegate {
                 saveTrees(middleTree: hit.node.parent!)
                 return
             }
-        }
-        
-        // No object was touch? Try feature points
-        let hitResultsFeaturePoints: [ARHitTestResult]  = sceneView.hitTest(location, types: .featurePoint)
-        
-        if let hit = hitResultsFeaturePoints.first {
-            
-            // Get the rotation matrix of the camera
-            let rotate = simd_float4x4(SCNMatrix4MakeRotation(sceneView.session.currentFrame!.camera.eulerAngles.y, 0, 1, 0))
-            
-            // Combine the matrices
-            let finalTransform = simd_mul(hit.worldTransform, rotate)
-            sceneView.session.add(anchor: ARAnchor(transform: finalTransform))
-            //sceneView.session.add(anchor: ARAnchor(transform: hit.worldTransform))
         }
         
     }

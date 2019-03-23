@@ -281,17 +281,17 @@ public class ViewController: UIViewController, ARSCNViewDelegate {
     }
     
     func fireParticleSystem() -> SCNParticleSystem{
-        let particleSystem = SCNParticleSystem(named: "Fire.scnp", inDirectory: nil)
+        let particleSystem = SCNParticleSystem(named: "Fire.scnp", inDirectory: "art.scnassets")
         return particleSystem!
     }
     
     func rainParticleSystem() -> SCNParticleSystem{
-        let particleSystem = SCNParticleSystem(named: "Rain.scnp", inDirectory: nil)
+        let particleSystem = SCNParticleSystem(named: "Rain.scnp", inDirectory: "art.scnassets")
         return particleSystem!
     }
     
     func smokeParticleSystem() -> SCNParticleSystem{
-        let particleSystem = SCNParticleSystem(named: "Smoke.scnp", inDirectory: nil)
+        let particleSystem = SCNParticleSystem(named: "Smoke.scnp", inDirectory: "art.scnassets")
         return particleSystem!
     }
     

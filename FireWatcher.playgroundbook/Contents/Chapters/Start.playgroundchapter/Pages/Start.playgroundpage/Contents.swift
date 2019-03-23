@@ -14,7 +14,7 @@ PlaygroundPage.current.liveView = ViewController()
  
  - Author: John Palevich
  
- You have taken up the job of being a Fire Watcher at a Famous National Park.
+ You have taken a job being a Fire Watcher at a Famous National Park.
  
  Your job is to make sure the forest is safe.
  

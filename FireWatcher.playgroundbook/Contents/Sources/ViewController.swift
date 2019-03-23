@@ -27,6 +27,8 @@ public class ViewController: UIViewController, ARSCNViewDelegate {
     var fireAudioPlayer: SCNAudioPlayer?
     var meadowSound = SCNAudioSource(fileNamed: "art.scnassets/Meadow.wav")!
     var meadowAudioPlayer: SCNAudioPlayer?
+    var crowSound = SCNAudioSource(fileNamed: "art.scnassets/Crow.wav")!
+    var crowAudioPlayer: SCNAudioPlayer?
     var rainSound = SCNAudioSource(fileNamed: "art.scnassets/Rain.wav")!
     var rainAudioPlayer: SCNAudioPlayer?
     var rainSoundPlay = false
@@ -61,6 +63,7 @@ public class ViewController: UIViewController, ARSCNViewDelegate {
         fireSound.loops = true
         meadowSound.loops = true
         rainSound.loops = true
+        crowSound.loops = true
     }
     
     func setUpWorld(){
@@ -79,8 +82,7 @@ public class ViewController: UIViewController, ARSCNViewDelegate {
     }
     
     func updateGame(){
-        if counter != 0 && counter % 10 == 0{
-            
+        if counter != 0 && counter % 15 == 0{
             spreadFire()
             
         }
@@ -327,11 +329,14 @@ public class ViewController: UIViewController, ARSCNViewDelegate {
     
     func meadowSFX(){
         meadowAudioPlayer = SCNAudioPlayer(source: meadowSound)
+        crowAudioPlayer = SCNAudioPlayer(source: crowSound)
         rootNode!.addAudioPlayer(meadowAudioPlayer!)
+        rootNode!.addAudioPlayer(crowAudioPlayer!)
     }
     
     func stopMeadowSFX(){
         rootNode!.removeAudioPlayer(meadowAudioPlayer!)
+        rootNode!.removeAudioPlayer(crowAudioPlayer!)
     }
     
     func treeNode() -> SCNNode {
@@ -425,7 +430,7 @@ public class ViewController: UIViewController, ARSCNViewDelegate {
         }
         //let width = CGFloat(planeAnchor.extent.x)
         //let height = CGFloat(planeAnchor.extent.z)
-        let plane = SCNPlane(width: 5, height: 5)
+        let plane = SCNPlane(width: 2.2, height: 2.2)
         
         // 3
         plane.materials.first?.diffuse.contents = UIColor.brown

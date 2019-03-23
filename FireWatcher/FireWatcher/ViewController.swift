@@ -115,7 +115,7 @@ public class ViewController: UIViewController, ARSCNViewDelegate {
         for i in -numTrees!/2..<numTrees!/2{
             for j in -numTrees!/2..<numTrees!/2{
                 let newRain = rainNode.clone()
-                newRain.simdPosition = float3(1 * Float(i), 10, 1 * Float(j))
+                newRain.simdPosition = float3(1 * Float(i), 20, 1 * Float(j))
                 let newTree = tree!.clone()
                 newTree.name = "tree"
                 newTree.simdPosition = float3(1 * Float(i), 0.5, 1*Float(j))
@@ -194,7 +194,9 @@ public class ViewController: UIViewController, ARSCNViewDelegate {
                         stopRainSFX()
                         rainSoundPlay = false
                     }
-                    rainParticles![i][j].removeAllParticleSystems()
+                    rootNode?.replaceChildNode(rainParticles![i][j], with: SCNNode())
+                    rainParticles![i][j] = SCNNode()
+                    
                 }
             }
         }
@@ -290,16 +292,22 @@ public class ViewController: UIViewController, ARSCNViewDelegate {
         rainSoundPlay = true
         numOnFire = numOnFire - 1
         let newTree = tree!.clone()
+        
+        let cloud = cloudNode()
+        cloud.simdPosition = rainParticles![x][y].simdPosition
+        cloud.simdScale = float3(0.225, 0.225, 0.225)
         let rainParticle = rainParticleSystem()
-        rainParticle.emitterShape = rainParticles![x][y].geometry
-        rainParticle.particleSize = 0.01
+        rainParticle.emitterShape = cloud.geometry
+        rainParticle.particleSize = 0.005
+        cloud.addParticleSystem(rainParticle)
         newTree.name = "tree"
         newTree.simdPosition = savedTree.simdPosition
-        rainParticles![x][y].addParticleSystem(rainParticle)
         newTree.simdScale = savedTree.simdScale
         particles![x][y] = 4
         isBurning![x][y] = false
         rootNode!.replaceChildNode(savedTree, with: newTree)
+        rootNode!.replaceChildNode(rainParticles![x][y], with: cloud)
+        rainParticles![x][y] = cloud
         forest![x][y] = newTree
         burningTrees.remove(at: burningTrees.firstIndex(of: savedTree)!)
     }
@@ -355,6 +363,12 @@ public class ViewController: UIViewController, ARSCNViewDelegate {
         let deadTreeScene = SCNScene(named: "art.scnassets/DeadTreeModel.dae")
         let deadTree = deadTreeScene?.rootNode
         return deadTree!
+    }
+    
+    func cloudNode() -> SCNNode{
+        let cloudScene = SCNScene(named: "art.scnassets/CloudModel.dae")
+        let cloud = cloudScene?.rootNode
+        return cloud!
     }
     
     func fireParticleSystem() -> SCNParticleSystem{
@@ -430,7 +444,7 @@ public class ViewController: UIViewController, ARSCNViewDelegate {
         }
         //let width = CGFloat(planeAnchor.extent.x)
         //let height = CGFloat(planeAnchor.extent.z)
-        let plane = SCNPlane(width: 2.5, height: 2.5)
+        let plane = SCNPlane(width: 2.2, height: 2.2)
         
         // 3
         plane.materials.first?.diffuse.contents = UIColor.brown

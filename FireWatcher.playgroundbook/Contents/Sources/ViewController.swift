@@ -10,7 +10,7 @@ import UIKit
 import SceneKit
 import ARKit
 
-class ViewController: UIViewController, ARSCNViewDelegate {
+public class ViewController: UIViewController, ARSCNViewDelegate {
 
     @IBOutlet var sceneView: ARSCNView!
     var tree: SCNNode?
@@ -23,8 +23,12 @@ class ViewController: UIViewController, ARSCNViewDelegate {
     var rainParticles: [[SCNNode]]?
     var rootNode: SCNNode?
     var timer: Timer?
-    override func viewDidLoad() {
+    public override func viewDidLoad() {
         super.viewDidLoad()
+        
+        sceneView = ARSCNView(frame: .zero)
+        self.view = sceneView
+        self.view.autoresizingMask = [.flexibleWidth, .flexibleHeight]
         
         sceneView.delegate = self
         
@@ -291,7 +295,7 @@ class ViewController: UIViewController, ARSCNViewDelegate {
         return particleSystem!
     }
     
-    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
+    public override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
         
         let location = touches.first!.location(in: sceneView)
         
@@ -328,7 +332,7 @@ class ViewController: UIViewController, ARSCNViewDelegate {
         
     }
     
-    override func viewWillAppear(_ animated: Bool) {
+    public override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         
         // Create a session configuration
@@ -341,7 +345,7 @@ class ViewController: UIViewController, ARSCNViewDelegate {
         
     }
     
-    override func viewWillDisappear(_ animated: Bool) {
+    public override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
         
         // Pause the view's session
@@ -352,7 +356,7 @@ class ViewController: UIViewController, ARSCNViewDelegate {
     
 
     // Override to create and configure nodes for anchors added to the view's session.
-    func renderer(_ renderer: SCNSceneRenderer, didAdd node: SCNNode, for anchor: ARAnchor) {
+    public func renderer(_ renderer: SCNSceneRenderer, didAdd node: SCNNode, for anchor: ARAnchor) {
         // 1
         
         guard let planeAnchor = anchor as? ARPlaneAnchor else { return }
@@ -388,17 +392,17 @@ class ViewController: UIViewController, ARSCNViewDelegate {
     }
 
     
-    func session(_ session: ARSession, didFailWithError error: Error) {
+    public func session(_ session: ARSession, didFailWithError error: Error) {
         // Present an error message to the user
         
     }
     
-    func sessionWasInterrupted(_ session: ARSession) {
+    public func sessionWasInterrupted(_ session: ARSession) {
         // Inform the user that the session has been interrupted, for example, by presenting an overlay
         
     }
     
-    func sessionInterruptionEnded(_ session: ARSession) {
+    public func sessionInterruptionEnded(_ session: ARSession) {
         // Reset tracking and/or remove existing anchors if consistent tracking is required
         
     }

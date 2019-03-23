@@ -42,8 +42,4 @@ done
 cp -r $APPNAME/ViewController.swift  $DSTROOT/Contents/Sources/
 
 # Reveal the playgroundbook in Finder.
-<<<<<<< HEAD
 open -R $DSTROOT
-=======
-open -R $DSTROOT
->>>>>>> 6202dc6f5c3b607940de691588cdcc12c7deb602

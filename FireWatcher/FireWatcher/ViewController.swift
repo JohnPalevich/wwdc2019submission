@@ -18,13 +18,14 @@ class ViewController: UIViewController, ARSCNViewDelegate {
     var isBurning: [[Bool]]?
     var numTrees: Int?
     var burningTrees:[SCNNode] = []
+    var particles: [[Int]]?
     var spreadTrees: [Int] = []
+    var rainParticles: [[SCNNode]]?
     var rootNode: SCNNode?
     var timer: Timer?
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        // Set the view's delegate
         sceneView.delegate = self
         
         // Show statistics such as fps and timing information
@@ -36,50 +37,61 @@ class ViewController: UIViewController, ARSCNViewDelegate {
         // Set the scene to the view
         sceneView.scene = scene
         sceneView.autoenablesDefaultLighting = true
-        
-        numTrees = 4
-        forest = Array(repeating: Array(repeating: SCNNode(), count: numTrees!), count: numTrees!)
-        isBurning = Array(repeating: Array(repeating: false, count: numTrees!), count: numTrees!)
-//        sceneView.debugOptions = [ARSCNDebugOptions.showFeaturePoints,
-//                                  ARSCNDebugOptions.showWorldOrigin/*,
-//             .showBoundingBoxes,
-//             .showWireframe,
-//             .showSkeletons,
-//             .showPhysicsShapes,
-//             .showCameras*/
-//        ]
-        // a camera
+        // Set the view's delegate
         let cameraNode = SCNNode()
         cameraNode.camera = SCNCamera()
         cameraNode.position = SCNVector3(x: 0, y: 0, z: 3)
         scene.rootNode.addChildNode(cameraNode)
-        rootNode = scene.rootNode
-        createTrees()
+    }
+    
+    func setUpWorld(){
+        numTrees = 20
+        forest = Array(repeating: Array(repeating: SCNNode(), count: numTrees!), count: numTrees!)
+        isBurning = Array(repeating: Array(repeating: false, count: numTrees!), count: numTrees!)
+        particles = Array(repeating: Array(repeating: 0, count: numTrees!), count: numTrees!)
+        rainParticles = Array(repeating: Array(repeating: SCNNode(), count: numTrees!), count: numTrees!)
+        //        sceneView.debugOptions = [ARSCNDebugOptions.showFeaturePoints,
+        //                                  ARSCNDebugOptions.showWorldOrigin/*,
+        //             .showBoundingBoxes,
+        //             .showWireframe,
+        //             .showSkeletons,
+        //             .showPhysicsShapes,
+        //             .showCameras*/
+        //        ]
+        // a camera
+        rootNode = SCNNode()
+        initializeNodes()
         igniteTree()
         //igniteSpecifiedTree(x: 0, y: 0)
         //isBurning![0][0] = true
-        timer =  Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { (t) in
+        timer =  Timer.scheduledTimer(withTimeInterval: 5, repeats: true) { (t) in
             self.updateGame()}
     }
     
     func updateGame(){
+        updateParticles()
         spreadFire()
-        //igniteTree()
+        igniteTree()
     }
     
-    func createTrees(){
+    func initializeNodes(){
         tree = treeNode()
+        let rainNode = SCNNode()
+        //rainNode = rainNode()
         for i in -numTrees!/2..<numTrees!/2{
             for j in -numTrees!/2..<numTrees!/2{
+                let newRain = rainNode.clone()
+                newRain.simdPosition = float3(1 * Float(i), 10, 1 * Float(j))
                 let newTree = tree!.clone()
                 newTree.name = "tree"
-                newTree.simdPosition = float3(1 * Float(i), -10, 1*Float(j))
+                newTree.simdPosition = float3(1 * Float(i), 0.5, 1*Float(j))
                 newTree.simdScale = float3(0.1,0.1,0.1)
                 rootNode!.addChildNode(newTree)
+                rootNode!.addChildNode(newRain)
+                rainParticles![i+numTrees!/2][j+numTrees!/2] = newRain
                 forest![i+numTrees!/2][j+numTrees!/2] = newTree
             }
         }
-
     }
     
     func spreadFire(){
@@ -116,15 +128,52 @@ class ViewController: UIViewController, ARSCNViewDelegate {
         }
     }
     
+    func updateParticles(){
+        for i in 0..<numTrees!{
+            for j in 0..<numTrees!{
+                if particles![i][j] == 1{
+                    particles![i][j] = 2
+                    forest![i][j].removeAllParticleSystems()
+                    let fire = fireParticleSystem()
+                    fire.emitterShape = forest![i][j].geometry
+                    fire.particleSize = 0.01
+                    fire.particleVelocity = fire.particleVelocity * 0.1
+                    //fire.birthRate = 0.
+                    forest![i][j].addParticleSystem(fire)
+                }
+                else if(particles![i][j] == 2){
+                    particles![i][j] = 3
+                }
+                else if(particles![i][j] == 3){
+                    //remove tree from play field
+                    let deadTree = deadTreeNode()
+                    deadTree.simdPosition = forest![i][j].simdPosition
+                    deadTree.simdScale = forest![i][j].simdScale
+                    rootNode!.replaceChildNode(forest![i][j], with: deadTree)
+                    forest![i][j] = deadTree
+
+                }
+                else if(particles![i][j] == 4){
+                    particles![i][j] = 0
+                    rainParticles![i][j].removeAllParticleSystems()
+                }
+            }
+        }
+    }
+    
     func igniteSpecifiedTree(x:Int, y:Int){
         let oldTree = forest![x][y]
         let ignitedTree = fireTreeNode()
-        let fireParticle = fireParticleSystem()
-        fireParticle.emitterShape = ignitedTree.geometry
+        let smokeParticle = smokeParticleSystem()
+        smokeParticle.emitterShape = ignitedTree.geometry
+        smokeParticle.particleSize = 0.1
+        smokeParticle.birthRate = smokeParticle.birthRate*5
+        smokeParticle.particleLifeSpan = smokeParticle.particleLifeSpan*0.5
         ignitedTree.name = "burning"
-        ignitedTree.addParticleSystem(fireParticle)
+        ignitedTree.addParticleSystem(smokeParticle)
         ignitedTree.simdPosition = oldTree.simdPosition
         ignitedTree.simdScale = oldTree.simdScale
+        particles![x][y] = 1;
         rootNode!.replaceChildNode(oldTree, with: ignitedTree)
         if(!burningTrees.contains(ignitedTree)){
             forest![x][y] = ignitedTree
@@ -143,9 +192,16 @@ class ViewController: UIViewController, ARSCNViewDelegate {
 //            z = Int(oldTree.simdPosition.z + Float(numTrees!/2))
 //        }
         let ignitedTree = fireTreeNode()
+        let smokeParticle = smokeParticleSystem()
+        smokeParticle.emitterShape = ignitedTree.geometry
+        smokeParticle.particleSize = 0.1
+        smokeParticle.birthRate = smokeParticle.birthRate*5
+        smokeParticle.particleLifeSpan = smokeParticle.particleLifeSpan*0.5
         ignitedTree.name = "burning"
+        ignitedTree.addParticleSystem(smokeParticle)
         ignitedTree.simdPosition = oldTree.simdPosition
         ignitedTree.simdScale = oldTree.simdScale
+        particles![randX][randY] = 1
         isBurning![randX][randY] = true
         rootNode!.replaceChildNode(oldTree, with: ignitedTree)
         forest![randX][randY] = ignitedTree
@@ -183,10 +239,18 @@ class ViewController: UIViewController, ARSCNViewDelegate {
     }
     
     func saveTree(savedTree:SCNNode, x:Int, y:Int){
+        if(forest![x][y].name != "burning"){
+            return
+        }
         let newTree = tree!.clone()
+        let rainParticle = rainParticleSystem()
+        rainParticle.emitterShape = rainParticles![x][y].geometry
+        rainParticle.particleSize = 0.01
         newTree.name = "tree"
         newTree.simdPosition = savedTree.simdPosition
+        rainParticles![x][y].addParticleSystem(rainParticle)
         newTree.simdScale = savedTree.simdScale
+        particles![x][y] = 4
         isBurning![x][y] = false
         rootNode!.replaceChildNode(savedTree, with: newTree)
         forest![x][y] = newTree
@@ -206,8 +270,24 @@ class ViewController: UIViewController, ARSCNViewDelegate {
         return fireTree
     }
     
+    func deadTreeNode() -> SCNNode{
+        let deadTreeScene = SCNScene(named: "art.scnassets/DeadTreeModel.dae")
+        let deadTree = deadTreeScene?.rootNode
+        return deadTree!
+    }
+    
     func fireParticleSystem() -> SCNParticleSystem{
         let particleSystem = SCNParticleSystem(named: "Fire.scnp", inDirectory: nil)
+        return particleSystem!
+    }
+    
+    func rainParticleSystem() -> SCNParticleSystem{
+        let particleSystem = SCNParticleSystem(named: "Rain.scnp", inDirectory: nil)
+        return particleSystem!
+    }
+    
+    func smokeParticleSystem() -> SCNParticleSystem{
+        let particleSystem = SCNParticleSystem(named: "Smoke.scnp", inDirectory: nil)
         return particleSystem!
     }
     
@@ -253,9 +333,12 @@ class ViewController: UIViewController, ARSCNViewDelegate {
         
         // Create a session configuration
         let configuration = ARWorldTrackingConfiguration()
-
+        configuration.planeDetection = .horizontal
+        sceneView.delegate = self
+        
         // Run the view's session
         sceneView.session.run(configuration)
+        
     }
     
     override func viewWillDisappear(_ animated: Bool) {
@@ -267,14 +350,43 @@ class ViewController: UIViewController, ARSCNViewDelegate {
 
     // MARK: - ARSCNViewDelegate
     
-/*
+
     // Override to create and configure nodes for anchors added to the view's session.
-    func renderer(_ renderer: SCNSceneRenderer, nodeFor anchor: ARAnchor) -> SCNNode? {
-        let node = SCNNode()
-     
-        return node
+    func renderer(_ renderer: SCNSceneRenderer, didAdd node: SCNNode, for anchor: ARAnchor) {
+        // 1
+        
+        guard let planeAnchor = anchor as? ARPlaneAnchor else { return }
+        
+        // 2
+        if rootNode != nil{
+            return
+        }
+        //let width = CGFloat(planeAnchor.extent.x)
+        //let height = CGFloat(planeAnchor.extent.z)
+        let plane = SCNPlane(width: 5, height: 5)
+        
+        // 3
+        plane.materials.first?.diffuse.contents = UIColor.brown
+        
+        // 4
+        let planeNode = SCNNode(geometry: plane)
+        
+        // 5
+        let x = CGFloat(planeAnchor.center.x)
+        let y = CGFloat(planeAnchor.center.y)
+        let z = CGFloat(planeAnchor.center.z)
+        planeNode.position = SCNVector3(x,y,z)
+        planeNode.eulerAngles.x = -.pi / 2
+        
+        // 6
+        
+        node.addChildNode(planeNode)
+        setUpWorld()
+        rootNode!.simdScale = float3(0.1,0.1,0.1)
+        node.addChildNode(rootNode!)
+        //node.simdScale = float3(0.1,0.1,0.1)
     }
-*/
+
     
     func session(_ session: ARSession, didFailWithError error: Error) {
         // Present an error message to the user

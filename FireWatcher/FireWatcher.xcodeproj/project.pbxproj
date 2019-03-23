@@ -7,6 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		525E40832245CB2B00DC2CAF /* Rain.scnp in Resources */ = {isa = PBXBuildFile; fileRef = 525E40822245CB2B00DC2CAF /* Rain.scnp */; };
+		525E40862245CF9B00DC2CAF /* smoke.png in Resources */ = {isa = PBXBuildFile; fileRef = 525E40842245CF9B00DC2CAF /* smoke.png */; };
+		525E40872245CF9B00DC2CAF /* Smoke.scnp in Resources */ = {isa = PBXBuildFile; fileRef = 525E40852245CF9B00DC2CAF /* Smoke.scnp */; };
 		52E5800E223F37DD00C4179D /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52E5800D223F37DD00C4179D /* AppDelegate.swift */; };
 		52E58010223F37DD00C4179D /* art.scnassets in Resources */ = {isa = PBXBuildFile; fileRef = 52E5800F223F37DD00C4179D /* art.scnassets */; };
 		52E58012223F37DD00C4179D /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52E58011223F37DD00C4179D /* ViewController.swift */; };
@@ -18,6 +21,9 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		525E40822245CB2B00DC2CAF /* Rain.scnp */ = {isa = PBXFileReference; lastKnownFileType = file.scp; name = Rain.scnp; path = art.scnassets/Rain.scnp; sourceTree = "<group>"; };
+		525E40842245CF9B00DC2CAF /* smoke.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = smoke.png; path = art.scnassets/smoke.png; sourceTree = "<group>"; };
+		525E40852245CF9B00DC2CAF /* Smoke.scnp */ = {isa = PBXFileReference; lastKnownFileType = file.scp; name = Smoke.scnp; path = art.scnassets/Smoke.scnp; sourceTree = "<group>"; };
 		52E5800A223F37DD00C4179D /* FireWatcher.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FireWatcher.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		52E5800D223F37DD00C4179D /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		52E5800F223F37DD00C4179D /* art.scnassets */ = {isa = PBXFileReference; lastKnownFileType = wrapper.scnassets; path = art.scnassets; sourceTree = "<group>"; };
@@ -69,6 +75,9 @@
 				52E5801B223F37DF00C4179D /* Info.plist */,
 				52FF1F9422435B88004B18C9 /* spark.png */,
 				52FF1F9522435B88004B18C9 /* Fire.scnp */,
+				525E40822245CB2B00DC2CAF /* Rain.scnp */,
+				525E40842245CF9B00DC2CAF /* smoke.png */,
+				525E40852245CF9B00DC2CAF /* Smoke.scnp */,
 			);
 			path = FireWatcher;
 			sourceTree = "<group>";
@@ -133,7 +142,10 @@
 			files = (
 				52FF1F9622435B88004B18C9 /* spark.png in Resources */,
 				52E58010223F37DD00C4179D /* art.scnassets in Resources */,
+				525E40832245CB2B00DC2CAF /* Rain.scnp in Resources */,
+				525E40862245CF9B00DC2CAF /* smoke.png in Resources */,
 				52E5801A223F37DF00C4179D /* LaunchScreen.storyboard in Resources */,
+				525E40872245CF9B00DC2CAF /* Smoke.scnp in Resources */,
 				52E58017223F37DF00C4179D /* Assets.xcassets in Resources */,
 				52FF1F9722435B88004B18C9 /* Fire.scnp in Resources */,
 				52E58015223F37DD00C4179D /* Main.storyboard in Resources */,

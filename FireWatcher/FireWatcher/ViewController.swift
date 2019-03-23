@@ -26,6 +26,10 @@ public class ViewController: UIViewController, ARSCNViewDelegate {
     public override func viewDidLoad() {
         super.viewDidLoad()
         
+        sceneView = ARSCNView(frame: .zero)
+        self.view = sceneView
+        self.view.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+        
         sceneView.delegate = self
         
         // Show statistics such as fps and timing information

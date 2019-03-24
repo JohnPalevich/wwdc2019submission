@@ -39,7 +39,7 @@ viewController.ignitionPeriod = 5
 // Changing spreadPeriod changes the number of seconds before the fire spreads.
 viewController.spreadPeriod = 15
 // Enter Hard Mode Here
-//: [Hard Mode](@next)
+//: [Go To Hard Mode](@next)
 //#-hidden-code
 PlaygroundPage.current.liveView = viewController
 //#-end-hidden-code

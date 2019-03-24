@@ -43,7 +43,7 @@ viewController.ignitionPeriod = 5
 // Changing spreadPeriod changes the number of seconds before the fire spreads.
 viewController.spreadPeriod = 15
 // Enter Easy Mode Here
-//: [Easy Mode](@previous)
+//: [Go To Easy Mode](@previous)
 //#-hidden-code
 viewController.hardMode = true
 PlaygroundPage.current.liveView = viewController

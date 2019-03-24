@@ -5,11 +5,10 @@
 	<key>Version</key>
 	<string>1.0</string>
 	<key>Name</key>
-	<string>Files</string>
-	<key>Pages</key>
-	<array>
-		<string>Start.playgroundpage</string>
-		<string>Hard.playgroundpage</string>
-	</array>
+	<string>Hard Mode</string>
+	<key>LiveViewMode</key>
+	<string>VisibleByDefault</string>
+	<key>LiveViewEdgeToEdge</key>
+	<true/>
 </dict>
 </plist>

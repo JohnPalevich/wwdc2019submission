@@ -33,10 +33,13 @@ public class ViewController: UIViewController, ARSCNViewDelegate {
     var rainAudioPlayer: SCNAudioPlayer?
     public var spreadPeriod = 15
     public var ignitionPeriod = 5
+    var breatherCounter = 0
     var rainSoundPlay = false
     var fireSoundPlay = false
     var numOnFire = 0
     var counter = 0
+    public var counterIncrement = 1
+    public var hardMode = false
     
     public override func viewDidLoad() {
         super.viewDidLoad()
@@ -82,17 +85,25 @@ public class ViewController: UIViewController, ARSCNViewDelegate {
     }
     
     func updateGame(){
+        if(breatherCounter >= 5){
+            breatherCounter = 0
+            return
+        }
         if counter != 0 && counter % spreadPeriod == 0{
             spreadFire()
             
         }
         if counter >= 10 && counter % ignitionPeriod == 0{
-            updateParticles()
             igniteTree()
+            breatherCounter = breatherCounter + 1
+        }
+        if counter >= 5 && counter % 5 == 0  {
+            updateParticles()
         }
         if counter == 0{
             meadowSFX()
         }
+        counter = counter + counterIncrement
         if(!fireSoundPlay && numOnFire > 0){
             fireSFX()
             stopMeadowSFX()
@@ -100,11 +111,13 @@ public class ViewController: UIViewController, ARSCNViewDelegate {
         }
         else if (fireSoundPlay && numOnFire == 0){
             stopFireSFX()
-            meadowSFX()
+            //meadowSFX()
             fireSoundPlay = false
+            counter = 0
+            if(hardMode){
+                counterIncrement = counterIncrement + 1
+            }
         }
-        counter = counter + 1
-        
     }
     
     func initializeNodes(){
@@ -167,27 +180,27 @@ public class ViewController: UIViewController, ARSCNViewDelegate {
             for j in 0..<numTrees{
                 if particles![i][j] == 1{
                     particles![i][j] = 2
+                }
+                else if(particles![i][j] == 2){
+                    particles![i][j] = 3
                     forest![i][j].removeAllParticleSystems()
                     let fire = fireParticleSystem()
                     fire.emitterShape = forest![i][j].geometry
                     fire.particleSize = 0.01
                     fire.particleVelocity = fire.particleVelocity * 0.1
-                    //fire.birthRate = 0.
                     forest![i][j].addParticleSystem(fire)
                 }
-                else if(particles![i][j] == 2){
-                    particles![i][j] = 3
-                }
                 else if(particles![i][j] == 3){
-                    //remove tree from play field
+                    particles![i][j] = 4
+                }
+                else if(particles![i][j] == 4){
                     let deadTree = deadTreeNode()
                     deadTree.simdPosition = forest![i][j].simdPosition
                     deadTree.simdScale = forest![i][j].simdScale
                     rootNode!.replaceChildNode(forest![i][j], with: deadTree)
                     forest![i][j] = deadTree
-
                 }
-                else if(particles![i][j] == 4){
+                else if(particles![i][j] == 5){
                     particles![i][j] = 0
                     if(rainSoundPlay){
                         stopRainSFX()
@@ -302,7 +315,7 @@ public class ViewController: UIViewController, ARSCNViewDelegate {
         newTree.name = "tree"
         newTree.simdPosition = savedTree.simdPosition
         newTree.simdScale = savedTree.simdScale
-        particles![x][y] = 4
+        particles![x][y] = 5
         isBurning![x][y] = false
         rootNode!.replaceChildNode(savedTree, with: newTree)
         rootNode!.replaceChildNode(rainParticles![x][y], with: cloud)

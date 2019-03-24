@@ -9,6 +9,7 @@
 	<key>Pages</key>
 	<array>
 		<string>Start.playgroundpage</string>
+		<string>Hard.playgroundpage</string>
 	</array>
 </dict>
 </plist>

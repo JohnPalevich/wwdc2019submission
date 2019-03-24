@@ -97,7 +97,7 @@ public class ViewController: UIViewController, ARSCNViewDelegate {
             igniteTree()
             breatherCounter = breatherCounter + 1
         }
-        if counter >= 5 && counter % 5 == 0  {
+        if counter >= (5*counterIncrement) && counter % (5*counterIncrement) == 0  {
             updateParticles()
         }
         if counter == 0{

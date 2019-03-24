@@ -3,7 +3,7 @@ import PlaygroundSupport
 let viewController = ViewController()
 //#-end-hidden-code
 /*:
- # Welcome to Firewatcher on Hard Mode
+ # Welcome to FireWatcher on Hard Mode
  
  - Author: John Palevich
  

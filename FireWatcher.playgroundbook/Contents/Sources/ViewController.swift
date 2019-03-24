@@ -336,11 +336,9 @@ public class ViewController: UIViewController, ARSCNViewDelegate {
     func rainSFX(){
         rainAudioPlayer = SCNAudioPlayer(source: rainSound)
         rootNode!.addAudioPlayer(rainAudioPlayer!)
-        print("lite")
     }
     
     func stopRainSFX(){
-        print("stop")
         if(rainAudioPlayer == nil){
             return
         }

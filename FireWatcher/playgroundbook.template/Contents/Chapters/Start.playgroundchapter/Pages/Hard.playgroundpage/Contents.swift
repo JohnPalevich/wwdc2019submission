@@ -7,7 +7,7 @@ let viewController = ViewController()
  
  - Author: John Palevich
  
- You have taken a job as a Fire Watcher at a famous National Park.
+ You have taken a job as a fire watcher at a famous national park.
  
  Your job is to make sure the forest is safe.
  
@@ -38,9 +38,9 @@ let viewController = ViewController()
 // Adjust numTrees to change the number of trees in a column and row.
 viewController.numTrees = 20
 // Adjust ignitionPeriod to change the number of seconds between random tree ignitions.
-viewController.ignitionPeriod = 7
+viewController.ignitionPeriod = 5
 // Changing spreadPeriod changes the number of seconds before the fire spreads.
-viewController.spreadPeriod = 20
+viewController.spreadPeriod = 15
 // Enter Easy Mode Here
 //: [Easy Mode](@previous)
 //#-hidden-code

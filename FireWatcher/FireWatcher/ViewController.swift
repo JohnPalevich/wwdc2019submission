@@ -37,6 +37,7 @@ public class ViewController: UIViewController, ARSCNViewDelegate {
     var fireSoundPlay = false
     var numOnFire = 0
     var counter = 0
+    var counterIncrement = 1
     
     public override func viewDidLoad() {
         super.viewDidLoad()
@@ -93,6 +94,7 @@ public class ViewController: UIViewController, ARSCNViewDelegate {
         if counter == 0{
             meadowSFX()
         }
+        counter = counter + counterIncrement
         if(!fireSoundPlay && numOnFire > 0){
             fireSFX()
             stopMeadowSFX()
@@ -100,11 +102,12 @@ public class ViewController: UIViewController, ARSCNViewDelegate {
         }
         else if (fireSoundPlay && numOnFire == 0){
             stopFireSFX()
-            meadowSFX()
+            //meadowSFX()
             fireSoundPlay = false
             counter = 0
+            //counterIncrement = counterIncrement + 1
         }
-        counter = counter + 1
+        
         
     }
     
